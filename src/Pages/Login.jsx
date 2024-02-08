@@ -1,10 +1,10 @@
 import { useState } from "react";
+import axios from "axios";
 
 const Login = () => {
-  // const [count, setCount] = useState(0);
   const [formValues, setFormValues] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -17,44 +17,41 @@ const Login = () => {
     });
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-  
-    // CSRFトークンを取得するためのリクエスト
-    const test = await fetch(import.meta.env.VITE_APP_API_URL, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    console.log(test)
-  
-    const loginData = {
-      email: formValues.email,
-      password: formValues.password,
-    };
-  
-    // ログイン
+  async function handleLogin() {
+    const apiUrl = import.meta.env.VITE_APP_API_URL;
+
     try {
-      const response = await fetch('http://127.0.0.1/api/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
+      await axios.get(`${apiUrl}/sanctum/csrf-cookie`, {
+        withCredentials: true,
       });
-  
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-  
-      const data = await response.json(); // レスポンスのJSONを解析
-      console.log('Login successful:', data);
-      // ログイン成功後の処理
+
+      // ログインリクエスト
+      const response = await axios.post(
+        `${apiUrl}/api/login`,
+        {
+          email: formValues.email,
+          password: formValues.password,
+        },
+        { withCredentials: true }
+      );
+
+      // ログイン成功
+      console.log("Login successful:", response.data);
+      sessionStorage.setItem("authToken", response.data.token);
     } catch (error) {
-      console.error('Login error:', error);
-      // エラー処理
+      // エラーハンドリング
+      if (error.response) {
+        // サーバーからのエラーレスポンス
+        console.error("Login error:", error.response.data);
+      } else if (error.request) {
+        // リクエストが送信されたがレスポンスがない
+        console.error("No response:", error.request);
+      } else {
+        // リクエスト設定時の問題
+        console.error("Error:", error.message);
+      }
     }
-  };
+  }
 
   return (
     <>
@@ -91,7 +88,10 @@ const Login = () => {
               />
             </div>
             <div className="relative mb-4">
-              <label htmlFor="password" className="leading-7 text-sm text-gray-400">
+              <label
+                htmlFor="password"
+                className="leading-7 text-sm text-gray-400"
+              >
                 パスワード
               </label>
               <input
@@ -117,6 +117,6 @@ const Login = () => {
       </section>
     </>
   );
-}
+};
 
 export default Login;
