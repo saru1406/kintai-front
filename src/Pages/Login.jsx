@@ -1,11 +1,14 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [formValues, setFormValues] = useState({
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +41,8 @@ const Login = () => {
       // ログイン成功
       console.log("Login successful:", response.data);
       sessionStorage.setItem("authToken", response.data.token);
+
+      navigate('/attendance');
     } catch (error) {
       // エラーハンドリング
       if (error.response) {
