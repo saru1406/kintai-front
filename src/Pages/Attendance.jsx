@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const Attendance = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   const weekday = ["日", "月", "火", "水", "木", "金", "土"];
+  const apiUrl = import.meta.env.VITE_APP_API_URL;
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -21,8 +22,6 @@ const Attendance = () => {
   const authToken = sessionStorage.getItem("authToken");
 
   const handleWorkStart = async () => {
-    console.log(jpDateString)
-    const apiUrl = import.meta.env.VITE_APP_API_URL;
     try {
       const response = await axios.post(`${apiUrl}/api/work/start`, { start_date: jpDateString }, {
         withCredentials: true,
@@ -35,6 +34,20 @@ const Attendance = () => {
       console.error(error);
     }
   };
+
+  const handleWorkEnd = async () => {
+    try {
+      const response = await axios.post(`${apiUrl}/api/work/end`, { end_date: jpDateString }, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      console.log(response);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <>
@@ -64,14 +77,14 @@ const Attendance = () => {
                 出勤
               </button>
               <button
-                // onClick={handleLogin}
+                onClick={handleWorkEnd}
                 className="text-white bg-red-500 border-0 py-2 px-8 focus:outline-none hover:bg-red-600 rounded text-lg mt-10 mx-10"
               >
                 退勤
               </button>
               <button
-                // onClick={handleLogin}
-                className="text-white bg-amber-500 border-0 py-2 px-8 focus:outline-none hover:bg-red-600 rounded text-lg mt-10 mx-10"
+                // onClick={handleWorkEnd}
+                className="text-white bg-amber-500 border-0 py-2 px-8 focus:outline-none hover:bg-amber-600 rounded text-lg mt-10 mx-10"
               >
                 休憩開始
               </button>
