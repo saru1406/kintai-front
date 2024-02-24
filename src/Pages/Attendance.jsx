@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const Attendance = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [remarks, setRemarks] = useState('')
   const weekday = ["日", "月", "火", "水", "木", "金", "土"];
   const apiUrl = import.meta.env.VITE_APP_API_URL;
 
@@ -14,6 +15,11 @@ const Attendance = () => {
     return () => clearInterval(intervalId);
   }, []);
 
+  const handleChange = (e) => {
+    const { value } = e.target;
+    setRemarks(value);
+  };
+
   const displayDate = `${currentDateTime.getFullYear()}年${currentDateTime.getMonth() + 1}月${currentDateTime.getDate()}日[${weekday[currentDateTime.getDay()]}]`;
   const displayTime = `${currentDateTime.getHours().toString().padStart(2, "0")}:${currentDateTime.getMinutes().toString().padStart(2, "0")}:${currentDateTime.getSeconds().toString().padStart(2, "0")}`;
 
@@ -23,29 +29,40 @@ const Attendance = () => {
 
   const handleWorkStart = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/api/work/start`, { start_date: jpDateString }, {
+      await axios.post(`${apiUrl}/api/work/start`, { remarks: remarks, start_date: jpDateString }, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      console.log(response);
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data.message);
     }
   };
 
   const handleWorkEnd = async () => {
     try {
-      const response = await axios.post(`${apiUrl}/api/work/end`, { end_date: jpDateString }, {
+      await axios.post(`${apiUrl}/api/work/end`, { remarks: remarks, end_date: jpDateString }, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      console.log(response);
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data.message);
+    }
+  }
+
+  const handleWorkBreak = async () => {
+    try {
+      await axios.post(`${apiUrl}/api/work/break-start`, { remarks: remarks, break_start: jpDateString }, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${authToken}`
+        },
+      });
+    } catch (error) {
+      console.error(error.response.data.message)
     }
   }
 
@@ -66,8 +83,10 @@ const Attendance = () => {
                 name="remarks"
                 id="remarks"
                 rows="3"
+                value={remarks}
+                onChange={handleChange}
                 className="w-full bg-gray-600 bg-opacity-20 focus:bg-transparent focus:ring-2 focus:ring-indigo-900 rounded border border-gray-600 focus:border-indigo-500 text-base outline-none text-gray-100 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-              ></textarea>
+              >{remarks}</textarea>
             </div>
             <div className="text-center">
               <button
@@ -83,7 +102,7 @@ const Attendance = () => {
                 退勤
               </button>
               <button
-                // onClick={handleWorkEnd}
+                onClick={handleWorkBreak}
                 className="text-white bg-amber-500 border-0 py-2 px-8 focus:outline-none hover:bg-amber-600 rounded text-lg mt-10 mx-10"
               >
                 休憩開始
