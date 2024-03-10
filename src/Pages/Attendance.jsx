@@ -10,6 +10,7 @@ const Attendance = () => {
   const weekday = ["日", "月", "火", "水", "木", "金", "土"];
   const apiUrl = import.meta.env.VITE_APP_API_URL;
   const authToken = sessionStorage.getItem("authToken");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -122,11 +123,18 @@ const Attendance = () => {
     }
   };
 
+  const handleNavigateIndex = () => {
+    navigate('/index')
+  };
+
   return (
     <>
-      <section className="text-gray-400 bg-gray-900 body-font overflow-hidden h-screen">
+      <section className="text-gray-400 bg-gray-900 body-font overflow-hidden h-screen ">
       {data && <div className="bg-emerald-300 mt-auto text-center text-black">{data.message}</div>}
         <div className="container mx-auto">
+          <div className="text-white text-right">
+            <button onClick={handleNavigateIndex}>勤怠一覧</button>
+          </div>
           <div className="mt-60" />
           <div className="mx-auto text-white p-10 w-3/5 border rounded">
             <div className="text-4xl text-center">
