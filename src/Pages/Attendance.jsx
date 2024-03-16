@@ -126,14 +126,17 @@ const Attendance = () => {
   const handleNavigateIndex = () => {
     navigate('/index')
   };
+  
+  const handleNavigateAttendance = () => navigate('/attendance')
 
   return (
     <>
       <section className="text-gray-400 bg-gray-900 body-font overflow-hidden h-screen ">
       {data && <div className="bg-emerald-300 mt-auto text-center text-black">{data.message}</div>}
         <div className="container mx-auto">
-          <div className="text-white text-right">
-            <button onClick={handleNavigateIndex}>勤怠一覧</button>
+          <div className="flex text-white">
+            <button className="mr-4" onClick={handleNavigateAttendance}>勤怠</button>
+            <button className="mr-4" onClick={handleNavigateIndex}>勤怠一覧</button>
           </div>
           <div className="mt-60" />
           <div className="mx-auto text-white p-10 w-3/5 border rounded">

@@ -10,39 +10,49 @@ const Index = () => {
   const navigate = useNavigate();
 
   const handleDateChange = async (event) => {
-    const selectedDate = event.target.value; // ユーザーが選択した年月（例: "202401"）
+    const selectedDate = event.target.value;
     setDate(selectedDate);
 
     // 年と月に分解
     const year = selectedDate.substring(0, 4);
     const month = selectedDate.substring(4, 6);
-    console.log(authToken);
 
     try {
       const response = await axios.get(`${apiUrl}/api/works`, {
-        params: { year: year, month: month }, // クエリパラメータとして正しく設定
+        params: { year: year, month: month },
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
       });
 
-      setData(response.data.work_data); // setData関数が未定義。適切な処理を行う必要があります。
+      setData(response.data.work_data);
       console.log(response);
     } catch (error) {
       console.error(error.response.data.message);
     }
   };
 
-  const handelNavigateShow = (e, date) => {
-    const params = date.replace(/-/g, "");
-    navigate(`/${params}`)
+  const handelNavigateShow = (e, year, date) => {
+    const params = date.replace(/月|日/g, "");
+    navigate(`/${year+params}`)
   }
+
+  const handleNavigateIndex = () => {
+    navigate('/index')
+  }
+
+  const handleNavigateAttendance = () => navigate('/attendance')
 
   return (
     <>
-      <section className="text-gray-400 bg-gray-900 body-font font-body">
-        <div className="container px-5 py-24 mx-auto">
+      <section className="text-gray-400 bg-gray-900 body-font font-body min-h-screen">
+        <div className="container mx-auto">
+        <div className="flex text-white">
+          <button className="mr-4" onClick={handleNavigateAttendance}>勤怠</button>
+          <button className="mr-4" onClick={handleNavigateIndex}>勤怠一覧</button>
+        </div>
+          <div className="px-5 py-24">
           <div className="flex flex-col text-center w-full mb-20">
             <h1 className="sm:text-4xl text-3xl font-medium title-font mb-2 text-white">
               勤怠一覧
@@ -64,6 +74,9 @@ const Index = () => {
           </div>
           <div className="lg:w-5/6 w-full mx-auto overflow-auto">
             <div className="text-white text-right m-5">CSV出力</div>
+            {/* <div className="text-white text-2xl">
+              {data[0]? data[0].year : ''}
+            </div> */}
             <table className="table-auto w-full text-left whitespace-no-wrap">
               <thead>
                 <tr>
@@ -82,6 +95,12 @@ const Index = () => {
                   <th className="px-4 py-3 title-font tracking-wider font-medium text-white text-sm bg-gray-800 text-center">
                     休憩終了
                   </th>
+                  <th className="px-4 py-3 title-font tracking-wider font-medium text-white text-sm bg-gray-800 text-center">
+                    小計
+                  </th>
+                  <th className="px-4 py-3 title-font tracking-wider font-medium text-white text-sm bg-gray-800 text-center">
+                    合計
+                  </th>
                   <th className="px-2 py-3 title-font tracking-wider font-medium text-white text-sm bg-gray-800 text-center rounded-tr rounded-br"></th>
                 </tr>
               </thead>
@@ -93,11 +112,14 @@ const Index = () => {
                     <td className="px-4 py-3 text-center border-b-2 border-gray-800">{item.works[0] ? item.works[0].end :'-'}</td>
                     <td className="px-4 py-3 text-center border-b-2 border-gray-800">{item.works[0] ? item.works[0].break_times[0] ? item.works[0].break_times[0].break_start : '-' : '-'}</td>
                     <td className="px-4 py-3 text-center border-b-2 border-gray-800">{item.works[0] ? item.works[0].break_times[0] ? item.works[0].break_times[0].break_end : '-' : '-'}</td>
-                    <td className="px-4 py-3 text-center border-b-2 border-gray-800"><span className="cursor-pointer text-blue-500" onClick={(e) => handelNavigateShow(e, item.date)}>{item.works.length >= 2 ? '他' + item.works.length + '件' : ''}</span></td>
+                    <td className="px-4 py-3 text-center border-b-2 border-gray-800">{item.total === '00:00' ? '-':  item.total }</td>
+                    <td className="border-b-2 border-gray-800"></td>
+                    <td className="px-4 py-3 text-center border-b-2 border-gray-800"><span className="cursor-pointer text-blue-500" onClick={(e) => handelNavigateShow(e, item.year, item.date)}>{item.works.length >= 2 ? '他' + item.works.length + '件' : ''}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </section>
