@@ -9,7 +9,6 @@ const Attendance = () => {
   const [data, setData] = useState(null);
   const weekday = ["日", "月", "火", "水", "木", "金", "土"];
   const apiUrl = import.meta.env.VITE_APP_API_URL;
-  const authToken = sessionStorage.getItem("authToken");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,9 +23,6 @@ const Attendance = () => {
       try {
         const response = await axios.get(`${apiUrl}/api/work/break-status`, {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
         });
         console.log(response.data);
         setIsOnBreak(response.data.break_status);
@@ -37,7 +33,7 @@ const Attendance = () => {
     };
 
     fetchBreakStatus();
-  }, [apiUrl, authToken]);
+  }, [apiUrl]);
 
   const handleChange = (e) => {
     const { value } = e.target;
@@ -56,9 +52,6 @@ const Attendance = () => {
         { remarks: remarks, start_date: jpDateString },
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
         }
       );
       setData(response.data);
@@ -74,9 +67,6 @@ const Attendance = () => {
         { remarks: remarks, end_date: jpDateString },
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
         }
       );
       setData(response.data);
@@ -92,9 +82,6 @@ const Attendance = () => {
         { remarks: remarks, break_start: jpDateString },
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
         }
       );
       setIsOnBreak(true);
@@ -111,9 +98,6 @@ const Attendance = () => {
         { remarks: remarks, break_end: jpDateString },
         {
           withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
         }
       );
       setIsOnBreak(false);

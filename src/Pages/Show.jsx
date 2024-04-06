@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const Show = () => {
   let { id } = useParams();
   const apiUrl = import.meta.env.VITE_APP_API_URL;
-  const authToken = sessionStorage.getItem("authToken");
   const [data, setData] = useState({ works: [] });
 
   const year = id.substring(0, 4);
@@ -17,15 +16,12 @@ const Show = () => {
       const response = await axios.get(`${apiUrl}/api/work`, {
         params: { year: year, month: month, day: day },
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
       });
       setData(response.data.work_date);
       console.log(response.data);
     };
     fetchShow();
-  },  [apiUrl, authToken]);
+  },  [apiUrl]);
 
   return (
     <>

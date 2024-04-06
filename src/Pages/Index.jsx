@@ -6,7 +6,6 @@ const Index = () => {
   const [date, setDate] = useState("");
   const [data, setData] = useState([]);
   const apiUrl = import.meta.env.VITE_APP_API_URL;
-  const authToken = sessionStorage.getItem("authToken");
   const navigate = useNavigate();
 
   const handleDateChange = async (event) => {
@@ -21,9 +20,6 @@ const Index = () => {
       const response = await axios.get(`${apiUrl}/api/works`, {
         params: { year: year, month: month },
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
       });
 
       setData(response.data.work_data);
@@ -32,6 +28,66 @@ const Index = () => {
       console.error(error.response.data.message);
     }
   };
+
+  const handleCsv = async() => {
+
+    // 年と月に分解
+    console.log(date)
+    const year = date.substring(0, 4);
+    const month = date.substring(4, 6);
+
+    try {
+      const response = await axios.get(`${apiUrl}/api/works/csv`, {
+        params: { year: year, month: month },
+        withCredentials: true,
+        responseType: 'blob',
+      });
+      
+      console.log(response.data)
+      // ダウンロード処理
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      // ダウンロードするファイルの名前を設定
+      link.setAttribute('download', `${year}${month}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); // 不要になったリンクをDOMから削除
+  
+    } catch (error) {
+      console.error(error.response?.data?.message || "An error occurred while downloading the CSV file.");
+    }
+  }
+
+  const handlePdf = async() => {
+
+    // 年と月に分解
+    console.log(date)
+    const year = date.substring(0, 4);
+    const month = date.substring(4, 6);
+
+    try {
+      const response = await axios.get(`${apiUrl}/api/works/pdf`, {
+        params: { year: year, month: month },
+        withCredentials: true,
+        responseType: 'blob',
+      });
+      
+      console.log(response.data)
+      // ダウンロード処理
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      // ダウンロードするファイルの名前を設定
+      link.setAttribute('download', `${year}${month}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link); // 不要になったリンクをDOMから削除
+  
+    } catch (error) {
+      console.error(error.response?.data?.message || "An error occurred while downloading the CSV file.");
+    }
+  }
 
   const handelNavigateShow = (e, year, date) => {
     const params = date.replace(/月|日/g, "");
@@ -66,14 +122,15 @@ const Index = () => {
                 value={date}
                 className="text-center bg-gray-600 bg-opacity-20 focus:bg-transparent focus:ring-2 focus:ring-indigo-900 rounded border border-gray-600 focus:border-indigo-500 text-base outline-none text-gray-100 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
               >
-                <option value="202401">2024年 1月</option>
-                <option value="202402">2024年 2月</option>
-                <option value="202403">2024年 3月</option>
+                <option className="bg-gray-900 focus:ring-2 focus:ring-indigo-900 focus:border-indigo-500 text-base outline-none" value="202401">2024年 1月</option>
+                <option className="bg-gray-900 focus:ring-2 focus:ring-indigo-900 focus:border-indigo-500 text-base outline-none" value="202402">2024年 2月</option>
+                <option className="bg-gray-900 focus:ring-2 focus:ring-indigo-900 focus:border-indigo-500 text-base outline-none" value="202403">2024年 3月</option>
               </select>
             </div>
           </div>
           <div className="lg:w-5/6 w-full mx-auto overflow-auto">
-            <div className="text-white text-right m-5">CSV出力</div>
+            <div className="text-white text-right m-5" onClick={handleCsv}>CSV出力</div>
+            <div className="text-white text-right m-5" onClick={handlePdf}>PDF出力</div>
             {/* <div className="text-white text-2xl">
               {data[0]? data[0].year : ''}
             </div> */}
